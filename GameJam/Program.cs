@@ -1,6 +1,4 @@
-﻿using System.Net.NetworkInformation;
-
-namespace GameJam
+﻿namespace GameJam
 {
 	internal class Program
 	{
