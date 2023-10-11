@@ -4,7 +4,9 @@
     {
         public string Name;
         public string Rank;
-        public bool Dead;
+        public bool IsDead;
+        public ConsoleColor NameColor;
+
         private Room _currentRoom;
 
         public Room CurrentRoom
