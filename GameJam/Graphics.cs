@@ -30,7 +30,7 @@ namespace GameJam
             /// </summary>
             /// <param name="fore">The foreground color</param>
             /// <param name="back">The background color</param>
-            public ConColor(ConsoleColor fore, ConsoleColor back)
+            public ConColor(ConsoleColor fore = ConsoleColor.White, ConsoleColor back = ConsoleColor.Black)
             { foreground = fore; background = back; }
 
             /// <summary>

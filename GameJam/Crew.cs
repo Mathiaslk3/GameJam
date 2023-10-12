@@ -5,7 +5,7 @@
         public string Name;
         public string Rank;
         public bool IsDead;
-        public ConsoleColor NameColor;
+        public Graphics.ConColor NameColor;
         public Dialog Dialog;
 
         private Room _currentRoom;
@@ -23,10 +23,11 @@
             }
         }
 
-        public Crew(string name, string rank, Room startRoom)
+        public Crew(string name, string rank, ConsoleColor nameColor, Room startRoom)
         {
             Name = name;
             Rank = rank;
+            NameColor = new Graphics.ConColor(nameColor);
             CurrentRoom = startRoom;
             Dialog = new()
             {
@@ -66,19 +67,34 @@
                 if (dialog == "!")
                 { break; }
 
-                Console.SetCursorPosition(dialogX, dialogY);
-                Console.WriteLine($"{dialog}\n");
-                (dialogX, dialogY) = Console.GetCursorPosition();
-
                 responses = Dialog.GetResponses(dialog);
                 if (responses[0] == "!")
                 { break; }
 
+                dialog = $"\t{dialog}\n----------------------------------\n";
+
+                Console.SetCursorPosition(dialogX, dialogY);
+                Program.g.WriteColor(this.Name, this.NameColor);
+                Console.WriteLine(dialog);
+                (dialogX, dialogY) = Console.GetCursorPosition();
+
                 int responseY = Program.g.BufferHeight - (responses.Length + 2);
+                if (dialogY >= responseY)
+                {
+                    dialogY = 0;
+                    Console.Clear();
+                    Console.WriteLine(dialog);
+                }
+
                 int responseIndex = Program.g.GetMarkedMenuInput(responses, true, true, 0, responseY);
                 lastResponse = responses[responseIndex];
 
-                for (int y = Program.g.BufferHeight-1; y >= responseY; y--)
+                Console.SetCursorPosition(dialogX, dialogY);
+                Program.g.WriteColor("You", new Graphics.ConColor(ConsoleColor.Green));
+                Console.WriteLine($"\t{lastResponse}\n----------------------------------\n");
+                (dialogX, dialogY) = Console.GetCursorPosition();
+
+                for (int y = Program.g.BufferHeight - 1; y >= responseY; y--)
                 {
                     Console.SetCursorPosition(0, y);
                     Console.Write(new string(' ', Program.g.BufferWidth));
