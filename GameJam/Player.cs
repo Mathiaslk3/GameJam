@@ -2,6 +2,7 @@
 {
     internal class Player
     {
+        private string[] intro = {};
         public int TimeCharge;
         public Dictionary<string, object> Inventory;
         public Room CurrentRoom;
@@ -12,5 +13,7 @@
             Inventory = new();
             CurrentRoom = startRoom;
         }
+
+        
     }
 }
