@@ -11,7 +11,12 @@
         { NPCDict = new(); ResponseDict = new(); }
 
         public string[] GetResponses(string dialog)
-        { return NPCDict[dialog]; }
+        {
+            List<string> responses = NPCDict[dialog].ToList();
+            responses.AddRange(new[] { " ", "Farvel" });
+
+            return responses.ToArray();
+        }
 
         public string GetResponseDialog(string response = "")
         { return ResponseDict[response]; }

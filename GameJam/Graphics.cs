@@ -151,15 +151,15 @@ namespace GameJam
         /// </summary>
         /// <param name="cColor">The colors to set as the consoles colors</param>
         /// <param name="setConsole">Whether or not the console should "refresh"</param>
-        public void SetConsoleColors(ConColor cColor, bool setConsole)
+        public void SetConsoleColors(ConColor cColor, bool clearConsole)
         {
             consoleColors = cColor;
-            if (setConsole)
-            {
-                Console.ForegroundColor = cColor.foreground;
-                Console.BackgroundColor = cColor.background;
-                Console.Clear();
-            }
+
+            Console.ForegroundColor = cColor.foreground;
+            Console.BackgroundColor = cColor.background;
+
+            if (clearConsole)
+            { Console.Clear(); }
         }
 
         /// <summary>
@@ -179,13 +179,14 @@ namespace GameJam
         /// </summary>
         /// <param name="text">The text to write</param>
         /// <param name="markedColor">The color to write the text with</param>
-        public void WriteColor(string text, ConColor markedColor)
+        public void WriteColor(string text, bool newline, ConColor markedColor)
         {
             // Set the colors to equal the markedColor colors
             // and then write the text
             Console.ForegroundColor = markedColor.foreground;
             Console.BackgroundColor = markedColor.background;
-            Console.WriteLine(text);
+            text = newline ? text + '\n' : text;
+            Console.Write(text);
 
             // Reset the colors
             Console.ForegroundColor = consoleColors.foreground;
@@ -331,7 +332,7 @@ namespace GameJam
             {
                 Console.SetCursorPosition(x, y + i);
                 if (i == marked)
-                { WriteColor(options[i], consoleColors.Flip()); }
+                { WriteColor(options[i], true, consoleColors.Flip()); }
                 else
                 { Console.Write(options[i]); }
             }
@@ -383,8 +384,11 @@ namespace GameJam
         /// <returns>The index of the string from the <c>options</c> array that was chosen</returns>
         public int GetMarkedMenuInput(string[] options, bool boxed, bool fillWidth, int x = -1, int y = -1)
         {
+            Console.CursorVisible = false;
             ConsoleKeyInfo cki = new();
             int marked = 0;
+
+            (int startX, int startY) = Console.GetCursorPosition();
 
             if (x == -1)
             { (x, _) = Console.GetCursorPosition(); }
@@ -394,25 +398,26 @@ namespace GameJam
             while (cki.Key != ConsoleKey.Enter)
             {
                 DrawMarkedMenu(options, marked, boxed, fillWidth, x, y);
-                Console.SetCursorPosition(0, 0);
 
                 cki = Console.ReadKey(true);
                 if (cki.Key == ConsoleKey.UpArrow)
                 {
                     marked = marked == 0 ? options.Length - 1 : marked - 1;
-                    if (string.IsNullOrEmpty(options[marked]))
+                    if (string.IsNullOrWhiteSpace(options[marked]))
                     { marked--; }
                 }
                 else if (cki.Key == ConsoleKey.DownArrow)
                 {
                     marked = marked == options.Length - 1 ? 0 : marked + 1;
-                    if (string.IsNullOrEmpty(options[marked]))
+                    if (string.IsNullOrWhiteSpace(options[marked]))
                     { marked++; }
                 }
                 else if (cki.Key == ConsoleKey.Enter)
                 { break; }
             }
 
+            Console.CursorVisible = true;
+            Console.SetCursorPosition(startX, startY);
             return marked;
         }
     }

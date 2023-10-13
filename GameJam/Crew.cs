@@ -35,7 +35,7 @@
                 {
                     { string.Empty, "Godav du, hvad laver du?" },
                     { "Ikke en skid", "Skide godt" },
-                    { "Din mor", "D... DU DÆLME SMART!" },
+                    { "Din mor", "Det gør ondt at høre dig udtrykke dig på den måde. Jeg troede, vi havde et gensidigt forhold præget af respekt\n\tog tillid. Lad os huske på, at vores ord har magt, og at de kan skabe dybe sår. Lad os vælge at udtrykke os med\n\tomtanke og kærlighed" },
                     { "Får tæsk af JBro", "Det kan jo ske" },
                     { "Tjo", "!" },
                     { "Undskyld", "!" },
@@ -45,7 +45,7 @@
                 NPCDict = new()
                 {
                     { "Godav du, hvad laver du?", new[] { "Ikke en skid", "Din mor", "Får tæsk af JBro" } },
-                    { "D... DU DÆLME SMART!", new[] { "Tjo", "Undskyld", ":)" } },
+                    { "Det gør ondt at høre dig udtrykke dig på den måde. Jeg troede, vi havde et gensidigt forhold præget af respekt\n\tog tillid. Lad os huske på, at vores ord har magt, og at de kan skabe dybe sår. Lad os vælge at udtrykke os med\n\tomtanke og kærlighed", new[] { "Tjo", "Undskyld", ":)" } },
                     { "Skide godt", new[] { "!" } },
                     { "Det kan jo ske", new[] { "Får tæsk af JBro", "Din mor" } }
                 }
@@ -54,52 +54,53 @@
 
         public void HaveDialog()
         {
-            bool dialogRunning = true;
+            Console.Clear();
             string lastResponse = string.Empty;
-            (int dialogX, int dialogY) = Console.GetCursorPosition();
 
-            while (dialogRunning)
+            while (true)
             {
                 string dialog;
                 string[] responses;
 
                 dialog = Dialog.GetResponseDialog(lastResponse);
-                if (dialog == "!")
-                { break; }
+                if (dialog == "!") { break; }
 
                 responses = Dialog.GetResponses(dialog);
-                if (responses[0] == "!")
-                { break; }
+                if (responses[0] == "!") { break; }
 
                 dialog = $"\t{dialog}\n----------------------------------\n";
 
-                Console.SetCursorPosition(dialogX, dialogY);
-                Program.g.WriteColor(this.Name, this.NameColor);
+                if (lastResponse != string.Empty)
+                {
+                    Program.g.WriteColor("Dig", true, new Graphics.ConColor(ConsoleColor.Green));
+                    Console.WriteLine($"\t{lastResponse}\n----------------------------------\n");
+                }
+
+                Program.g.WriteColor(this.Name, true, this.NameColor);
                 Console.WriteLine(dialog);
-                (dialogX, dialogY) = Console.GetCursorPosition();
+                (_, int dialogY) = Console.GetCursorPosition();
 
                 int responseY = Program.g.BufferHeight - (responses.Length + 2);
                 if (dialogY >= responseY)
                 {
-                    dialogY = 0;
-                    Console.Clear();
-                    Console.WriteLine(dialog);
+                    int diff = dialogY - responseY;
+                    Console.Write(new string('\n', diff));
                 }
 
-                int responseIndex = Program.g.GetMarkedMenuInput(responses, true, true, 0, responseY);
-                lastResponse = responses[responseIndex];
-
-                Console.SetCursorPosition(dialogX, dialogY);
-                Program.g.WriteColor("You", new Graphics.ConColor(ConsoleColor.Green));
-                Console.WriteLine($"\t{lastResponse}\n----------------------------------\n");
-                (dialogX, dialogY) = Console.GetCursorPosition();
+                int resIndex = Program.g.GetMarkedMenuInput(responses, true, true, 0, responseY);
+                if (resIndex == responses.Length - 1) { break; }
+                lastResponse = responses[resIndex];
 
                 for (int y = Program.g.BufferHeight - 1; y >= responseY; y--)
                 {
                     Console.SetCursorPosition(0, y);
                     Console.Write(new string(' ', Program.g.BufferWidth));
                 }
+
+                Console.SetCursorPosition(0, dialogY);
             }
+
+            Console.Clear();
         }
     }
 }
